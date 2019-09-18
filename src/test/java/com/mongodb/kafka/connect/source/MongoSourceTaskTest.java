@@ -326,6 +326,26 @@ class MongoSourceTaskTest {
         verify(mongoIterable, times(1)).iterator();
     }
 
+//    @Test
+//    @DisplayName("test uses resume token as source record key by default")
+//    void testUsesResumeTokenAsSourceRecordKeyByDefault() {
+//        MongoSourceConfig config = new MongoSourceConfig(new HashMap<>());
+//        MongoSourceTask task = new MongoSourceTask();
+//
+//        MongoCursor<BsonDocument> cursor = task.createCursor(config, mongoClient);
+//
+//        verify(mongoClient, times(1)).getDatabase(TEST_DATABASE);
+//        verify(mongoDatabase, times(1)).getCollection(TEST_COLLECTION);
+//        verify(mongoCollection, times(1)).watch();
+//        verify(changeStreamIterable, times(1)).withDocumentClass(BsonDocument.class);
+//        verify(mongoIterable, times(1)).iterator();
+//
+//
+//        while(!cursor.hasNext()) {
+//
+//        }
+//    }
+
     private void resetMocks() {
         reset(mongoClient, mongoDatabase, mongoCollection, changeStreamIterable, mongoIterable, context, offsetStorageReader);
     }

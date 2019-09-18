@@ -46,8 +46,11 @@ import com.mongodb.client.model.changestream.FullDocument;
 import com.mongodb.kafka.connect.util.ConfigHelper;
 import com.mongodb.kafka.connect.util.ConnectConfigException;
 import com.mongodb.kafka.connect.util.Validators;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MongoSourceConfig extends AbstractConfig {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MongoSourceConfig.class);
 
     public static final String CONNECTION_URI_CONFIG = "connection.uri";
     private static final String CONNECTION_URI_DEFAULT = "mongodb://localhost:27017,localhost:27018,localhost:27019";
@@ -114,6 +117,12 @@ public class MongoSourceConfig extends AbstractConfig {
             + "watched.";
     private static final String COLLECTION_DEFAULT = "";
 
+    public static final String SOURCE_RECORD_KEY_CONFIG = "source.record.key";
+    private static final String SOURCE_RECORD_KEY_DISPLAY = "The message key to be used.";
+    private static final String SOURCE_RECORD_KEY_DOC = "The message key to be used from the change stream document. If not set then the "
+            + "resume token (i.e. the _id field of the change stream doc) is used.";
+    private static final String SOURCE_RECORD_KEY_DEFAULT = "_id";
+
     public static final ConfigDef CONFIG = createConfigDef();
     private static final List<Consumer<MongoSourceConfig>> INITIALIZERS = singletonList(MongoSourceConfig::validateCollection);
 
@@ -125,11 +134,13 @@ public class MongoSourceConfig extends AbstractConfig {
 
     private MongoSourceConfig(final Map<?, ?> originals, final boolean validateAll) {
         super(CONFIG, originals);
+        LOGGER.info("WOW WTF MAN 1 {}", this.getString(SOURCE_RECORD_KEY_CONFIG));
         connectionString = new ConnectionString(getString(CONNECTION_URI_CONFIG));
 
         if (validateAll) {
             INITIALIZERS.forEach(i -> i.accept(this));
         }
+        LOGGER.info("WOW WTF MAN 2 {}", this.getString(SOURCE_RECORD_KEY_CONFIG));
     }
 
     public ConnectionString getConnectionString() {
@@ -304,7 +315,24 @@ public class MongoSourceConfig extends AbstractConfig {
                 Width.MEDIUM,
                 POLL_AWAIT_TIME_MS_DISPLAY);
 
+        defineSourceRecordConfigs(configDef, group, orderInGroup);
+
         return configDef;
     }
 
+    private static int defineSourceRecordConfigs(final ConfigDef configDef, final String group, final int currentOrderInGroup) {
+        int orderInGroup = currentOrderInGroup;
+
+        configDef.define(SOURCE_RECORD_KEY_CONFIG,
+                Type.STRING,
+                SOURCE_RECORD_KEY_DEFAULT,
+                Importance.MEDIUM,
+                SOURCE_RECORD_KEY_DOC,
+                group,
+                ++orderInGroup,
+                Width.MEDIUM,
+                SOURCE_RECORD_KEY_DISPLAY);
+
+        return orderInGroup;
+    }
 }
