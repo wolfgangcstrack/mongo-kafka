@@ -123,6 +123,21 @@ public class MongoKafkaTestCase {
         }
     }
 
+//    public List<String> getProducedKeys(final int expectedCount, final String topicName) {
+//        LOGGER.info("Subscribing to {} expecting to see #{}", topicName, expectedCount);
+//        try (KafkaConsumer<?, ?> consumer = createConsumer()) {
+//            consumer.subscribe(singletonList(topicName));
+//            List<String> data = new ArrayList<>();
+//            int retryCount = 0;
+//            while (data.size() < expectedCount && retryCount < 5) {
+//                consumer.poll(Duration.ofSeconds(10)).records(topicName).forEach((r) -> data.add(r.key().toString()));
+//                retryCount++;
+//                LOGGER.info("Polling {} ({}) seen: #{}", topicName, retryCount, data.size());
+//            }
+//            return data;
+//        }
+//    }
+
     public KafkaConsumer<?, ?> createConsumer() {
         Properties props = new Properties();
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "testAssertProducedConsumer");
